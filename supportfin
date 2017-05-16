@@ -1,0 +1,52 @@
+function doPost(e){
+  var id = '（スプレッドシートのID）';
+  //about spread sheet
+  var ss = SpreadsheetApp.openById(id);
+  var buppin = ss.getSheetByName('物品貸し出し');
+  var jinzai = ss.getSheetByName('人材派遣');
+  var net = ss.getSheetByName('ネット管理');
+  
+  var token = PropertiesService.getScriptProperties().getProperty('Slack_Access_Token');
+  var app = SlackApp.create(token);
+  var message = "おつかれさまでした！";
+  var options = {
+    //channelId: "#support", //チャンネル名
+    channelId: "#03_support",
+    icon_url: "（アイコンのURL）",
+    username: "System" //投稿するbotの名前
+  };
+    // 投稿
+  var post_info = app.postMessage(options.channelId, message, options);
+  
+  //separate to array
+  var array = e.parameter.text.split(" ");
+  if(array[1] == 'b'){
+    f_buppin(buppin,array);
+  }
+  else if(array[1] == 'j'){
+    f_jinzai(jinzai,array);
+  }
+  else if(array[1] == 'n'){
+    f_net(net,array);
+  }
+  return true;
+}
+
+
+function f_buppin(buppin,array){
+  //serch last line
+  var num = parseInt(array[2],10)+1;
+  var rangenum  = buppin.getRange(num,6).setValue("○");
+}
+
+function f_jinzai(jinzai,array){
+  //serch last line
+  var num = parseInt(array[2],10)+1;
+  var rangenum  = jinzai.getRange(num,6).setValue("○");
+}
+
+function f_net(net,array){
+  //serch last line
+  var num = parseInt(array[2],10)+1;
+  var rangenum  = net.getRange(num,6).setValue("○");
+}

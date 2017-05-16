@@ -1,0 +1,83 @@
+function doPost(e){
+  var id = 'GoogleスプレッドシートのID';
+  //about spread sheet
+  //スプレッドシートを定義
+  var ss = SpreadsheetApp.openById(id);
+  //シートを定義
+  var buppin = ss.getSheetByName('物品貸し出し');
+  var jinzai = ss.getSheetByName('人材派遣');
+  var net = ss.getSheetByName('ネット管理');
+  //入力内容をスペース区切りにしてarrayという配列に格納
+  var array = e.parameter.text.split(" ");
+  //SlackのTokenをプロパティでSlack_Access_Tokenとして設定
+  var token = PropertiesService.getScriptProperties().getProperty('Slack_Access_Token');
+  //Slack上でこの機能をappというアプリとして使うよという定義
+  var app = SlackApp.create(token);
+  //カウントが何回目かを返すために各シートの最終行数を足している
+  var count = buppin.getLastRow()+jinzai.getLastRow()+net.getLastRow()-2;
+  //もしスペース区切りのSlackからの入力の2番目が物品だったら．．．
+  if(array[1] == '物品'){
+    var num1 = buppin.getLastRow();
+    var message = "good job!"+"\n"+"これは"+count+"番目のサポートです！"+"（サポート番号：" + num1 + "）";
+  }
+  else if(array[1] == '人材派遣'){
+    var num2 = jinzai.getLastRow();
+    var message = "good job!"+"\n"+"これは"+count+"番目のサポートです！"+"（サポート番号：" + num2 + "）";
+  }
+  else if(array[1] == 'ネット管理'){
+    var num3 = net.getLastRow();
+    var message = "good job!"+"\n"+"これは"+count+"番目のサポートです！"+"（サポート番号：" + num3 + "）";
+  }
+  //Slackにappが投稿する時の名前などオプションを設定
+  var options = {
+    //channelId: "#support", //チャンネル名
+    channelId: "チャンネル名",
+    icon_url: "適当にアイコンにしたい画像のURLを入れる",
+    username: "System" //投稿するbotの名前
+  };
+    // ここで投稿
+  var post_info = app.postMessage(options.channelId, message, options);
+  
+  //どの関数を起動するかを選択
+  if(array[1] == '物品'){
+    f_buppin(buppin,array);
+  }
+  else if(array[1] == '人材派遣'){
+    f_jinzai(jinzai,array);
+  }
+  else if(array[1] == 'ネット管理'){
+    f_net(net,array);
+  }
+  return true;
+}
+//物品用の関数（引数はどのシートを更新するかとユーザの入力内容）
+function f_buppin(buppin,array){
+  //serch last line
+  //スプレッドシートの特定のセルの値をgetして，新しい値をsetするカッコ内第1引数が行，第2引数が列に対応．setは変数も可
+  var lastline  = buppin.getLastRow();
+  var rangenum  = buppin.getRange(lastline+1,1).setValue(lastline);
+  var rangenew  = buppin.getRange(lastline+1,2).setValue(array[2]);
+  var rangenew1 = buppin.getRange(lastline+1,3).setValue(array[3]);
+  var rangenew2 = buppin.getRange(lastline+1,4).setValue(array[4]);
+  var rangenew3 = buppin.getRange(lastline+1,5).setValue(array[5]);
+}
+
+function f_jinzai(jinzai,array){
+  //serch last line
+  var lastline = jinzai.getLastRow();
+  var rangenum = jinzai.getRange(lastline+1,1).setValue(lastline);
+  var rangenew = jinzai.getRange(lastline+1,2).setValue(array[2]);
+  var rangenew1 = jinzai.getRange(lastline+1,3).setValue(array[3]);
+  var rangenew2 = jinzai.getRange(lastline+1,4).setValue(array[4]);
+  var rangenew3 = sheet.getRange(lastline+1,5).setValue(array[5]);
+}
+
+function f_net(net,array){
+  //serch last line
+  var lastline = net.getLastRow();
+  var rangenum = net.getRange(lastline+1,1).setValue(lastline);
+  var rangenew = net.getRange(lastline+1,2).setValue(array[2]);
+  var rangenew1 = net.getRange(lastline+1,3).setValue(array[3]);
+  var rangenew2 = net.getRange(lastline+1,4).setValue(array[4]);
+  var rangenew3 = net.getRange(lastline+1,5).setValue(array[5]);
+}
